@@ -110,8 +110,8 @@ async function main(): Promise<void> {
           res.end(err instanceof Error ? err.message : String(err));
         }
       });
-      server.listen(port, () => {
-        console.log(`TPM Command Center at http://localhost:${port}${demo ? " (demo data)" : ""}`);
+      server.listen(port, "127.0.0.1", () => {
+        console.log(`TPM Command Center at http://localhost:${port}${demo ? " (demo data)" : ""} (localhost only)`);
         console.log(`Visit /sync to force a re-pull from your MCP servers. Ctrl+C to stop.`);
       });
       break;

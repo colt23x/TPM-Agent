@@ -14,17 +14,29 @@ import { Snapshot } from "./store";
 export async function sync(config: Config, now = new Date()): Promise<Snapshot> {
   const host = new McpHost();
   const entities: Entity[] = [];
+  const servers = Object.entries(config.servers);
+  let failures = 0;
   try {
-    for (const [name, serverCfg] of Object.entries(config.servers)) {
-      const adapter = getAdapter(serverCfg.adapter);
-      process.stderr.write(`Connecting to "${name}" (${serverCfg.adapter} adapter)...\n`);
-      await host.connect(name, serverCfg);
-      const fetched = await adapter.fetch(host, name, serverCfg);
-      process.stderr.write(`  ${fetched.length} entities from ${name}\n`);
-      entities.push(...fetched);
+    for (const [name, serverCfg] of servers) {
+      try {
+        const adapter = getAdapter(serverCfg.adapter);
+        process.stderr.write(`Connecting to "${name}" (${serverCfg.adapter} adapter)...\n`);
+        await host.connect(name, serverCfg);
+        const fetched = await adapter.fetch(host, name, serverCfg);
+        process.stderr.write(`  ${fetched.length} entities from ${name}\n`);
+        entities.push(...fetched);
+      } catch (err) {
+        failures++;
+        process.stderr.write(
+          `  Failed to sync "${name}": ${err instanceof Error ? err.message : String(err)}\n`
+        );
+      }
     }
   } finally {
     await host.closeAll();
+  }
+  if (servers.length > 0 && failures === servers.length) {
+    throw new Error(`All ${failures} configured server(s) failed to sync.`);
   }
   return enrich(entities, config, now);
 }

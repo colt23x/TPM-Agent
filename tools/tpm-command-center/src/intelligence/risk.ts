@@ -38,14 +38,13 @@ export function detectRisks(entities: Entity[], config: Config, now = new Date()
         const daysSinceActivity = e.updatedAt
           ? (now.getTime() - Date.parse(e.updatedAt)) / 86400_000
           : Infinity;
-        if (daysToDue <= 5 && daysSinceActivity > 3) {
-          e.flags.push({
-            type: "slipping",
-            reason: `due in ${Math.max(0, Math.round(daysToDue))} day(s) with no activity for ${Math.round(daysSinceActivity)} day(s)`,
-          });
-        }
         if (daysToDue < 0) {
           e.flags.push({ type: "slipping", reason: `due date passed ${Math.round(-daysToDue)} day(s) ago` });
+        } else if (daysToDue <= 5 && daysSinceActivity > 3) {
+          e.flags.push({
+            type: "slipping",
+            reason: `due in ${Math.round(daysToDue)} day(s) with no activity for ${Math.round(daysSinceActivity)} day(s)`,
+          });
         }
       }
 

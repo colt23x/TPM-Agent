@@ -40,7 +40,14 @@ export function loadConfig(configPath?: string): Config {
     );
   }
   const raw = JSON.parse(fs.readFileSync(p, "utf-8"));
-  return { ...DEFAULTS, ...raw };
+  const config: Config = { ...DEFAULTS, ...raw };
+  if (!config.me || !Array.isArray(config.me.names) || !Array.isArray(config.me.emails)) {
+    throw new Error(`Invalid config at ${p}: "me" must be an object with "names" and "emails" arrays.`);
+  }
+  if (!config.servers || typeof config.servers !== "object") {
+    throw new Error(`Invalid config at ${p}: "servers" must be an object mapping server names to configs.`);
+  }
+  return config;
 }
 
 export function isMe(config: Config, who?: string): boolean {
