@@ -12,7 +12,7 @@ Full design rationale, goals, and phasing live in [SPEC.md](SPEC.md). This READM
 - **Correlation** (`src/intelligence/correlate.ts`) — links entities across tools via explicit references and shared identifiers (ticket keys, dependency links) into `Workstream` groupings with recorded evidence. Precision over recall; no LLM in the loop yet (that's Phase 2 residue-matching).
 - **Risk detection** (`src/intelligence/risk.ts`) — deterministic rules, never model guesses: **blocked**, **slipping** (with upstream propagation), **stale**, **owed** (spec §8.3).
 - **Attention ranking** (`src/intelligence/rank.ts`) — every item scored for how much it needs you *now*, with human-readable reasons and a suppression threshold. Most items should score low and stay out of the way.
-- **Views** (`src/views/`) — `today` ("what needs me?"), `prep` ("prep me for this meeting"), `risks` ("what's at risk?"), plus an **HTML dashboard** (`html`/`serve`) that renders all of them on one page: stat tiles, the attention list with scores and reasons, the schedule with inline meeting prep, risk sections, and workstreams with linking evidence. Self-contained (no external assets), light/dark aware.
+- **Views** (`src/views/`) — `today` ("what needs me?"), `prep` ("prep me for this meeting"), `risks` ("what's at risk?"), plus an **HTML dashboard** (`html`/`serve`) that renders all of them on one page: stat tiles, the attention list with scores and reasons, the schedule with inline meeting prep, risk sections, and workstreams with linking evidence. Self-contained (no external assets), light/dark aware. `serve` binds to `localhost` only.
 
 Not yet implemented (later phases per spec §10): LLM-assisted correlation, Slack/GitHub adapters, status generation, and the confirmed write-back surface.
 
@@ -39,7 +39,9 @@ npx ts-node src/index.ts --demo html          # or write dashboard.html and open
    cp servers.example.json servers.json
    ```
 
-   Each entry names an adapter (`jira`, `calendar`) and how to reach the server — a `command`/`args` pair for stdio servers or a `url` for remote ones — plus its auth env vars. `servers.json` is gitignored; secrets never leave your machine except to the MCP server itself.
+   Each entry names an adapter (`jira`, `calendar`) and how to reach the server — a `command`/`args` pair for stdio servers or a `url` for remote ones — plus its auth env vars. `servers.json` is gitignored; secrets never leave your machine except to the MCP server itself. `me` and `servers` are required — `loadConfig` rejects a config missing either.
+
+   A sync that fails to connect to one server logs the error and continues with the rest; it only throws if every configured server fails.
 
 2. Set `me.names` / `me.emails` to how you appear as an assignee/attendee in your tools — that's what "is this mine / waiting on me" checks use.
 
