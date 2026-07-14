@@ -13,9 +13,20 @@ Each tool lives in its own directory under `tools/`, with its own README, depend
 
 See each tool's README for setup, configuration, and usage details.
 
+## Playbooks
+
+Alongside automation tools, this repo holds playbooks for leading engineering teams:
+
+| Playbook | What it covers |
+|----------|----------------|
+| [Leading an Engineering Team in the Age of AI-Assisted Development](playbooks/ai-engineering-team-playbook.md) | The practices I use to run a ~50-engineer org on coding agents (Claude Code, Codex, Copilot, Cursor) — and how to apply them to any team: sharing context as versioned code, keeping repos agent-ready, driving adoption, rebuilding code review around the new bottleneck, guardrails, measurement, and a 30/60/90 plan for bringing it to a new org. |
+
 ## Repo Layout
 
 ```
+playbooks/
+└── ai-engineering-team-playbook.md   # Leading a team in AI-assisted development
+
 tools/
 ├── tpm-command-center/     # MCP-connected TPM work surface (see table above)
 │   ├── README.md
